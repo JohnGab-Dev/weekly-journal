@@ -11,9 +11,21 @@ use App\Models\Preferences;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpWord\TemplateProcessor;
+use App\Helpers\LogRecorder;
 
 class StudentController extends Controller
 {
+    public function getPreference(Request $request){
+        $preference = Preferences::where('userId', $request->id)->first();
+        if(!$preference){
+            return response()->json([
+                'data' => ''
+            ]);
+        }
+        return response()->json([
+            'data' => $preference
+        ]);
+    }
     public function exportReport(Request $request){
 
         $userId = Auth::id();
@@ -77,6 +89,7 @@ class StudentController extends Controller
 
         $templateProcessor->setValue('owner', $name);
         $templateProcessor->setValue('coordinator', $coordinator);
+        $templateProcessor->setValue('institution', $department);
         $templateProcessor->setValue('job_description', $designation);
         $date_range = "".date('M, d, Y', strtotime($startDate))." - ".date('M, d, Y', strtotime($endDate));
         $templateProcessor->setValue('date_range', $date_range);
@@ -102,15 +115,10 @@ class StudentController extends Controller
             $objIndex++;
         }
 
-        $reportDates = ReportDate::whereBetween('date', [$startDate, $endDate])->get();
+        $reportDates = ReportDate::whereBetween('date', [$startDate, $endDate])->where('userId', $userId)->orderBy('date', 'ASC')->get();
         
         //rows
         $templateProcessor->cloneRow('date', count($reportDates));
-
-        $tasks = [];
-        $knowledges = [];
-        $skills = [];
-        $values = [];
 
         $index = 1;
         foreach ($reportDates as $reportDate) {
@@ -120,65 +128,64 @@ class StudentController extends Controller
                 date('F d, Y', strtotime($reportDate->date))
             );
 
-            //tasks blocks
-            foreach($reports as $report){
-                if($report->date === $reportDate && $report->type === 'task_accomplished'){
-                    $tasks[] = $report->desc;
-                }
-                if($report->date === $reportDate && $report->type === 'knowledge'){
-                    $knowledges[] = $report->desc;
-                }
-                if($report->date === $reportDate && $report->type === 'skills'){
-                    $skills[] = $report->desc;
-                }
-                if($report->date === $reportDate && $report->type === 'values'){
-                    $values[] = $report->desc;
-                }
-            }
-            $templateProcessor->cloneBlock('task_block', count($tasks), true, true);
-            $templateProcessor->cloneBlock('knowledge_block', count($knowledges), true, true);
-            $templateProcessor->cloneBlock('skills_block', count($skills), true, true);
-            $templateProcessor->cloneBlock('values_block', count($values), true, true);
-            $taskIndex = 1;
-            foreach ($tasks as $task) {
-                $templateProcessor->setValue(
-                    'task_accomplish#' . ($taskIndex),
-                    $task
-                );
-                $taskIndex++;
-            }
-            
-            $knowledgeIndex = 1;
-            foreach ($knowledges as $knowledge) {
-                $templateProcessor->setValue(
-                    'knowledge#' . ($knowledgeIndex),
-                    $knowledge
-                );
-                $knowledgeIndex++;
-            }
-
-            $skillIndex = 1;
-            foreach ($skills as $skill) {
-                $templateProcessor->setValue(
-                    'skills#' . ($skillIndex),
-                    $skill
-                );
-                $skillIndex++;
-            }
-
-            $valuesIndex = 1;
-            foreach ($values as $value) {
-                $templateProcessor->setValue(
-                    'values#' . ($valuesIndex),
-                    $value
-                );
-                $valuesIndex++;
-            }
-            
             $tasks = [];
             $knowledges = [];
             $skills = [];
             $values = [];
+
+            //tasks blocks
+            foreach($reports as $report){
+                if (date('Y-m-d', strtotime($report->date)) === date('Y-m-d', strtotime($reportDate->date))) {
+                    if ($report->type === 'task_accomplished') {
+                        $tasks[] = $report->desc;
+                    }
+
+                    if ($report->type === 'knowledge') {
+                        $knowledges[] = $report->desc;
+                    }
+
+                    if ($report->type === 'skills') {
+                        $skills[] = $report->desc;
+                    }
+
+                    if ($report->type === 'values') {
+                        $values[] = $report->desc;
+                    }
+                }
+            }
+            $templateProcessor->cloneBlock('task_block#'. ($index), count($tasks), true, true);
+            $templateProcessor->cloneBlock('knowledge_block#'. ($index), count($knowledges), true, true);
+            $templateProcessor->cloneBlock('skills_block#'. ($index), count($skills), true, true);
+            $templateProcessor->cloneBlock('values_block#'. ($index), count($values), true, true);
+
+            for ($taskIndex = 1; $taskIndex <= count($tasks); $taskIndex++) {
+                $templateProcessor->setValue(
+                    "task_accomplish#{$index}#{$taskIndex}",
+                    $tasks[$taskIndex - 1]
+                );
+            }
+
+            for ($knowledgeIndex = 1; $knowledgeIndex <= count($knowledges); $knowledgeIndex++) {
+                $templateProcessor->setValue(
+                    "knowledge#{$index}#{$knowledgeIndex}",
+                    $knowledges[$knowledgeIndex - 1]
+                );
+            }
+            
+            for ($skillIndex = 1; $skillIndex <= count($skills); $skillIndex++) {
+                $templateProcessor->setValue(
+                    "skills#{$index}#{$skillIndex}",
+                    $skills[$skillIndex - 1]
+                );
+            }
+
+            for ($valuesIndex = 1; $valuesIndex <= count($values); $valuesIndex++) {
+                $templateProcessor->setValue(
+                    "values#{$index}#{$valuesIndex}",
+                    $values[$valuesIndex - 1]
+                );
+            }
+            
             $index++;
         }
 
@@ -186,44 +193,45 @@ class StudentController extends Controller
         $templateProcessor->setValue('date_prepared', date('F d, Y', strtotime($endDate)));
         $templateProcessor->setValue('head', $head_name);
         $templateProcessor->setValue('head_designation', $head_designation);
-        $templateProcessor->setValue('date_signed', $endDate);
+        $templateProcessor->setValue('date_signed', date('F d, Y', strtotime($endDate)));
 
         $reportImages = ReportDate::whereBetween('date', [$startDate, $endDate])->where('documentation', '!=', '')->get();
-        $templateProcessor->cloneBlock('task_block', count($reportImages), true, true);
-
-        foreach ($reportImages as $index => $img) {
-
+        $templateProcessor->cloneBlock('docu_block', count($reportImages), true, true);
+        $imgIndex = 1;
+        foreach ($reportImages as $img) {
             $templateProcessor->setImageValue(
-                'image#' . ($index + 1),
+                'image#' . $imgIndex,
                 [
-                    'path' => storage_path('app/public' . $img->path),
-                    'width' => 300,
-                    'height' => 200,
+                    'path' => storage_path('app/public/' . ltrim($img->documentation, '/')),
+                    'width' => 600,
+                    'height' => 300,
                     'ratio' => true,
                 ]
             );
 
             // Description
             $templateProcessor->setValue(
-                'image_description#' . ($index + 1),
-                $img->description
+                'image_description#' . $imgIndex,
+                $img->description." ".date('F d, Y', strtotime($img->date))
             );
+            $imgIndex++;
         }
 
-        $fileName = 'report.docx';
-        $savePath = storage_path("app/public/$fileName");
+    
+        $fileName = preg_replace('/[^A-Za-z0-9]/', '_', trim($name)) . '_' . date('Ymd_His') . '.docx';
+        $tempFile = tempnam(sys_get_temp_dir(), 'docx');
 
-        $templateProcessor->saveAs($savePath);
-        // $dl = download($savePath)->deleteFileAfterSend(true);
+        $templateProcessor->saveAs($tempFile);
+        
+        LogRecorder::RecordLog("EXPORT", "Exported a report.");
 
-        // if(!$dl){
-        //     return response()->json([
-        //         'message' => 'Something went wrong'
-        //     ]);
-        // }
-        return response()->json([
-            'message' => 'Export Successfull'
-        ]);
+        return response()->download(
+            $tempFile,
+            $fileName,
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ]
+        )->deleteFileAfterSend(true);
         
     }
 }

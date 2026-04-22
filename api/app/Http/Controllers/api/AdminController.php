@@ -307,7 +307,7 @@ class AdminController extends Controller
                 'email' => $email,
             ]);
 
-            LogRecorder::RecordLog("UPDATE", "Update a Own Profile.");
+            LogRecorder::RecordLog("UPDATE", "Update own profile information.");
 
             return response()->json([
                 'message' => 'User updated successfully'

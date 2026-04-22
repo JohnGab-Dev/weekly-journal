@@ -1,4 +1,4 @@
-import { SignupForm } from "@/components/signup-form"
+import { SignupForm } from "@/components/auth/signup-form"
 import { TitleRender } from '@/utils/TitleRender'
 export default function Page() {
   TitleRender("ReportMaker | Signup")

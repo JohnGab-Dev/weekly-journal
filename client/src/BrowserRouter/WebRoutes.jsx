@@ -7,6 +7,9 @@ import HomePage from "@/pages/homePage"
 //auth
 import LoginPage from "@/pages/Auth/login";
 import SignupPage from "@/pages/Auth/signup"
+import VerifyEmail from "@/pages/Auth/VerifyEmail"
+import VerifyOtp from "@/pages/Auth/VerifyOtp"
+import ChangePass from "@/pages/Auth/Cpass"
 
 //admin
 import Dashboard from "@/pages/admin/dashboard"
@@ -21,6 +24,7 @@ import UserPage from "@/pages/user/home";
 
 //route protection
 import ProtectedRoutes from "@/utils/ProtectedRoutes";
+import AuthRoutes from "@/utils/AuthRoutes";
 
 
 //notfound
@@ -31,21 +35,24 @@ function WebRoutes() {
     <div>
       <Router>
         <Routes>
-            <Route path="/" element={<HomePage />} /> 
+            <Route path="/" element={<HomePage />} />
 
-            <Route path="/login" element={<LoginPage />} /> 
-            <Route path="/signup" element={<SignupPage />} /> 
+            <Route path="/login" element={<AuthRoutes><LoginPage /></AuthRoutes>} /> 
+            <Route path="/signup" element={<AuthRoutes><SignupPage /></AuthRoutes>} /> 
+            <Route path="/email-verify" element={<AuthRoutes><VerifyEmail /></AuthRoutes>} />
+            <Route path="/verify-otp" element={<AuthRoutes><VerifyOtp /></AuthRoutes>} />
+            <Route path="/change-password" element={<AuthRoutes><ChangePass /></AuthRoutes>} />
 
-            <Route path="/dashboard" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} /> 
-            <Route path="/users" element={<ProtectedRoutes><UsersPage /></ProtectedRoutes>} /> 
-            <Route path="/user-logs" element={<ProtectedRoutes><UserLogs /></ProtectedRoutes>} /> 
-            <Route path="/events" element={<ProtectedRoutes><Events /></ProtectedRoutes>} /> 
-            <Route path="/account-settings" element={<ProtectedRoutes><Account /></ProtectedRoutes>} /> 
-            <Route path="/bin" element={<ProtectedRoutes><Bin /></ProtectedRoutes>} />
+            <Route path="/dashboard" element={<ProtectedRoutes roles={['admin']}><Dashboard /></ProtectedRoutes>} /> 
+            <Route path="/users" element={<ProtectedRoutes roles={['admin']}><UsersPage /></ProtectedRoutes>} /> 
+            <Route path="/user-logs" element={<ProtectedRoutes roles={['admin']}><UserLogs /></ProtectedRoutes>} /> 
+            <Route path="/events" element={<ProtectedRoutes roles={['admin']}><Events /></ProtectedRoutes>} /> 
+            <Route path="/account-settings" element={<ProtectedRoutes roles={['admin']}><Account /></ProtectedRoutes>} /> 
+            <Route path="/bin" element={<ProtectedRoutes roles={['admin']}><Bin /></ProtectedRoutes>} />
 
 
             {/* users */}
-            <Route path="/home" element={<ProtectedRoutes><UserPage /></ProtectedRoutes>} /> 
+            <Route path="/home" element={<ProtectedRoutes roles={['employee', 'student']}><UserPage /></ProtectedRoutes>} /> 
 
             <Route path="*" element={<NotFound />} /> 
         </Routes>

@@ -13,8 +13,27 @@ export const signup = (data) => {
 }
 
 export const logout = () => {
-    console.log(localStorage.getItem('token'))
     const res = api.post('/logout');
+    
+    return res
+}
+
+
+export const emailVerify = (data) => {
+    const res = api.post('/email-verify', data);
+    
+    return res
+}
+
+
+export const verifyOtp = (data) => {
+    const res = api.post('/otp-verify', data);
+    
+    return res
+}
+
+export const changePass = (data) => {
+    const res = api.post('/change-pass', data);
     
     return res
 }

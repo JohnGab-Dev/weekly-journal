@@ -17,6 +17,9 @@ Route::get('/user', function (Request $request) {
 Route::get('/home', [HomeController::class, 'index']);
 Route::post('/signup', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('/change-pass', [AuthController::class, 'changPass']);
 
 
 Route::middleware('auth:sanctumn')->group(function(){
@@ -27,9 +30,11 @@ Route::middleware('auth:sanctumn')->group(function(){
 
 Route::middleware('auth:sanctumn', 'role:student')->group(function(){
     Route::post('/student-export', [StudentController::class, 'exportReport']);
+    Route::get('/get-preference', [StudentController::class, 'getPreference']);
 });
 
 Route::middleware('auth:sanctumn', 'role:employee')->group(function(){
+    Route::get('/get-employee-preference', [EmployeeController::class, 'getPreference']);
     Route::post('/employee-export', [EmployeeController::class, 'exportReport']);
 });
 

@@ -47,7 +47,7 @@ function Page() {
   return (
     <div className='bg-muted min-h-screen'>
       <NavBar user={user} />
-      <div className='w-full py-6 items-center flex flex-col gap-6'>
+      <div className='w-full px-2 sm:px-0 py-6  sm:items-center flex flex-col gap-6'>
         <div className=''>
           {(!add && !edit && !account && !exportReport)  && (
             <Calendar 
@@ -55,13 +55,14 @@ function Page() {
             events={events} reportDates={reportDates} 
             selectedEvent={selectedEvent}
             selectedReport={selectedReport}
+            user={user}
             />
           )}
 
           {add && (
             <div>
               <Link to="/home" className='flex items-center gap-1 mb-4 hover:underline'><MoveLeft /> Back to homepage</Link>
-              <AddReport />
+              <AddReport user={user} />
             </div>
             
           )}
@@ -69,7 +70,7 @@ function Page() {
           {edit && (
             <div>
               <Link to="/home" className='flex items-center gap-1 mb-4 hover:underline'><MoveLeft /> Back to homepage</Link>
-              <EditReport date={edit} />
+              <EditReport date={edit} user={user} />
             </div>
             
           )}
@@ -85,7 +86,7 @@ function Page() {
           {exportReport && (
             <div>
               <Link to="/home" className='flex items-center gap-1 mb-4 hover:underline'><MoveLeft /> Back to homepage</Link>
-              <ExportReport />
+              <ExportReport user={user} />
             </div>
             
           )}

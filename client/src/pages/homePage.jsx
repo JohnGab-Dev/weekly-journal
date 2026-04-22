@@ -8,8 +8,8 @@ function HomePage() {
   return (
     <div className='bg-muted min-h-screen flex flex-col items-center justify-center gap-4'>
       
-      <h1 className='text-gray-700 text-7xl' >Report<span className='text-black font-semibold'>Maker</span> </h1>
-      <h2 className='text-gray-600 '>Record and Export your Weekly Report Just by a Click.</h2>
+      <h1 className='text-gray-700 text-5xl sm:text-7xl' >Report<span className='text-black font-semibold'>Maker</span> </h1>
+      <h2 className='text-gray-600 text-sm sm:text-base'>Record and Export your Weekly Report Just by a Click.</h2>
 
       <div className='flex items-center justify-center gap-4'>
         <Link to="/login"><Button variant='' className='cursor-pointer'>Login</Button></Link>

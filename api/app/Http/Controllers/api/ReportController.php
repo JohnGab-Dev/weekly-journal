@@ -9,6 +9,7 @@ use App\Models\Events;
 use App\Models\ReportDate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\LogRecorder;
 
 class ReportController extends Controller
 {
@@ -55,7 +56,7 @@ class ReportController extends Controller
         $reportDateId = 0;
         $userId = Auth::id();
 
-        $existingDate = ReportDate::where('date', $date)->first();
+        $existingDate = ReportDate::where('date', $date)->where('userId', $userId)->first();
 
         if($existingDate){
             $reportDateId = $existingDate->reportDateId;
@@ -80,6 +81,8 @@ class ReportController extends Controller
             ]);
         }
 
+        LogRecorder::RecordLog("INSERT", "Added New Report.");
+
         return response()->json([
             'message' => "Report successfully recorded."
         ], 200);
@@ -91,7 +94,6 @@ class ReportController extends Controller
                 'image' => 'image|mimes:jpg,png,jpeg|max:2048'
             ]);
         }
-
         
         $reportDateId = $request->id;
         $date = $request->date;
@@ -114,7 +116,6 @@ class ReportController extends Controller
         }else{
             ReportDate::where('reportDateId', $reportDateId)->update([
                 'date' => $date,
-                'description' => $doc_desc,
             ]);
         }
         
@@ -133,6 +134,8 @@ class ReportController extends Controller
             }
         }
 
+        LogRecorder::RecordLog("UPDATE", "Updated a report.");
+
         return response()->json([
             'message' => "Report successfully updated."
         ], 200);
@@ -141,6 +144,8 @@ class ReportController extends Controller
     public function delReport(Request $request){
         $reportId = $request->id;
         Report::where('reportId', $reportId)->delete();
+
+        LogRecorder::RecordLog("DELETE", "Deleted some part of report.");
 
          return response()->json([
             'message' => "Report successfully deleted."
@@ -159,6 +164,8 @@ class ReportController extends Controller
         }
 
         $report->delete();
+
+        LogRecorder::RecordLog("DELETE", "Deleted a report");
 
         return response()->json([
             'message' => "Report Date successfully deleted."

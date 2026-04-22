@@ -21,7 +21,7 @@ import toast from 'react-hot-toast'
 import { editReport, delReport } from "@/services/ReportServices"
 import api from "@/axiosInstance/api"
 
-function EditReport({ date }) {
+function EditReport({ date, user }) {
     const [Report, setReport] = useState()
     
     const fetchReport = async () => {
@@ -84,7 +84,7 @@ function EditReport({ date }) {
         if (data.image && data.image[0]) {
             formData.append("image", data.image[0])
         }
-        formData.append("doc_desc", data.doc_desc)
+        formData.append("doc_desc", data.doc_desc ?? "")
 
         // nested items array
         data.items.forEach((item, index) => {
@@ -149,36 +149,40 @@ function EditReport({ date }) {
   return (
     <div className="bg-white rounded-xl">
         <div className="p-6 border-b">   
-            <h1 className="text-xl font-semibold">Edit a Report</h1>
-            <h2 className="text-sm text-gray-700">Edit your existing report here.</h2>
+            <h1 className="sm:text-xl font-semibold">Edit a Report</h1>
+            <h2 className="text-xs sm:text-sm text-gray-700">Edit your existing report here.</h2>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 p-6">
-            <div className='w-2xl flex flex-col gap-4'>
+            <div className='w-full sm:w-2xl flex flex-col gap-4'>
                 <Field>
                     <FieldLabel htmlFor="date">Date</FieldLabel>
                     <Input id="date" type="date" disabled 
                     {...register("date")} />
                 </Field>
-                <Field>
-                    <FieldLabel htmlFor="image">Documentation(Choose a file to update your current image)</FieldLabel>
-                    <Input id="image" type="file" {...register("image")}
-                    />
-                </Field>
-                <Field>
-                    <FieldLabel htmlFor="doc_desc">Documentation Description</FieldLabel>
-                    <Textarea placeholder="Type the description here." id={"doc_desc"}
-                    {...register("doc_desc", { required: "Description is required" })}
-                    />
-                </Field>
+                {user.role === "student" && (
+                    <>
+                        <Field>
+                            <FieldLabel htmlFor="image" className=''>Documentation(Choose a file to update your current image)</FieldLabel>
+                            <Input id="image" type="file" {...register("image")}
+                                />
+                        </Field>
+                        <Field>
+                            <FieldLabel htmlFor="doc_desc">Documentation Description</FieldLabel>
+                            <Textarea placeholder="Type the description here." id={"doc_desc"}
+                            {...register("doc_desc")}
+                            />
+                        </Field>
+                    </>
+                )}
+                
             </div>
             <div className="">
                 <h1>Report fields</h1>
             </div>
             {fields.map((item, index) => (
-                <div className='w-2xl flex flex-col p-4 bg-gray-50 rounded-lg' key={item.id}>
-                    <div className="w-full flex gap-4">
-                        
-                        <Field className="w-[75%]">
+                <div className='w-full sm:w-2xl flex flex-col p-4 bg-gray-50 rounded-lg' key={item.id}>
+                    <div className="w-full flex flex-col-reverse sm:flex-row gap-4">
+                        <Field className="sm:w-[75%]">
                             <FieldLabel htmlFor={`items.${index}.desc`}>Description</FieldLabel>
                             <Textarea placeholder="Type the description here." id={`items.${index}.desc`}
                                 {...register(`items.${index}.desc`, { required: "Description is required" })}
@@ -189,7 +193,7 @@ function EditReport({ date }) {
                                     </p>
                                 )}
                         </Field>
-                        <Field className="w-[25%]">
+                        <Field className="sm:w-[25%]">
                             <FieldLabel htmlFor={`items.${index}.type`}>
                             Type
                             </FieldLabel>
@@ -204,14 +208,14 @@ function EditReport({ date }) {
                                     <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="objective">Objective</SelectItem>
-                                        <SelectItem value="reflection">Reflection</SelectItem>
-                                        <SelectItem value="task_accomplished">Task Accomplished</SelectItem>
-                                        <SelectItem value="knowledge">Knowledge</SelectItem>
-                                        <SelectItem value="skills">Skills</SelectItem>
-                                        <SelectItem value="values">Values</SelectItem>
-                                    </SelectGroup>
+                                        <SelectGroup>
+                                            <SelectItem value="objective">Objective</SelectItem>
+                                            <SelectItem value="reflection">Reflection</SelectItem>
+                                            <SelectItem value="task_accomplished">Task Accomplished</SelectItem>
+                                            <SelectItem value="knowledge">Knowledge</SelectItem>
+                                            <SelectItem value="skills">Skills</SelectItem>
+                                            <SelectItem value="values">Values</SelectItem>
+                                        </SelectGroup>
                                     </SelectContent>
                                 </Select>
                                 {errors.items?.[index]?.type && (

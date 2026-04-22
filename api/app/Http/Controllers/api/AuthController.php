@@ -101,4 +101,27 @@ class AuthController extends Controller
             'message' => 'Log out successful!',
         ], 200);
     }
+
+    public function verifyEmail(Request $request){
+        $email = $request->email;
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $userId = $user->userId;
+        $otp = rand(100000, 999999);
+        User::where('userId', $userId)->update([
+            'otp' => $otp,
+        ]);
+        
+    } 
+    public function verifyOtp(Request $request){
+
+    } 
+    public function changPass(Request $request){
+
+    }
 }

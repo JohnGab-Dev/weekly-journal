@@ -19,7 +19,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DeleteModal } from "@/components/modals/DeleteReport";
 
-export default function Calendar({ fetchTaskEvents, events, reportDates, selectedEvent, selectedReport }) {
+export default function Calendar({ fetchTaskEvents, events, reportDates, selectedEvent, selectedReport, user }) {
 
   const [openDel, setOpenDel] = useState(false)
   const today = new Date();
@@ -30,7 +30,7 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
   const [search, setSearch] = useState(dateToday)
   const years = Array.from({ length: 50 }, (_, i) => 2000 + i);
   
-
+  const role = user.role
   const months = [
     "January","February","March","April","May","June",
     "July","August","September","October","November","December"
@@ -47,6 +47,7 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
     setDate(day);
     const formatted = format(day, "yyyy-MM-dd");
     setSearch(formatted)
+    console.log(events)
   };
 
   const handleMonthChange = (e) => {
@@ -96,17 +97,18 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
             key={day}
             onClick={() => handleDateClick(cloneDay)}
             className={`
-              h-24 w-24 rounded-md text-sm flex flex-col justify-between p-2
-              transition relative
-              ${!isCurrentMonth ? "text-muted-foreground/40" : ""}
-              ${
-                isSelected 
-                  ? "bg-primary text-primary-foreground"
-                  : isToday
-                  ? "bg-blue-100 text-blue-800 font-semibold"
-                  : "hover:bg-accent hover:text-accent-foreground"
-              }
-            `}
+                  aspect-square w-full rounded-md text-xs sm:text-sm 
+                  flex flex-col justify-between p-1 sm:p-2
+                  transition relative
+                  ${!isCurrentMonth ? "text-muted-foreground/40" : ""}
+                  ${
+                    isSelected 
+                      ? "bg-primary text-primary-foreground"
+                      : isToday
+                      ? "bg-blue-100 text-blue-800 font-semibold"
+                      : "hover:bg-accent hover:text-accent-foreground"
+                  }
+                `}
           >
             {/* DAY NUMBER */}
             <span className="text-left">{format(day, "d")}</span>
@@ -114,10 +116,10 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
             {/* EVENT DOTS */}
             <div className="flex gap-1 mt-1 justify-end">
               {events && events.some(item => item.date === format(day, "yyyy-MM-dd")) && (
-                <span className="py-1 px-2 rounded-full bg-yellow-100 text-yellow-600 border border-yellow-300 text-xs font-semibold">E</span>
+                <span className="sm:px-2 sm:py-1 rounded-full text-[10px] sm:text-xs sm:bg-yellow-100 text-yellow-600 sm:border border-yellow-300 font-semibold">E</span>
               )}
               {reportDates && reportDates.some(item => item.date === format(day, "yyyy-MM-dd")) && (
-                <span className="py-1 px-2 rounded-full bg-blue-100 text-blue-600 border border-blue-300 text-xs font-semibold">R</span>
+                <span className="sm:px-2 sm:py-1 rounded-full text-[10px] sm:text-xs sm:bg-blue-100 text-blue-600 sm:border border-blue-300 font-semibold">R</span>
               )}
               
             </div>
@@ -128,7 +130,7 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
       }
 
       rows.push(
-        <div key={day} className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-[2px] sm:gap-1">
           {days}
         </div>
       );
@@ -140,9 +142,9 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
   };
 
   return (
-    <div className=" w-7xl flex gap-4 bg-white rounded-xl">
+    <div className="w-full sm:w-7xl flex flex-col lg:flex-row gap-4 bg-white rounded-xl">
       {/* 📅 CALENDAR */}
-      <div className="w-[65%] p-4 rounded-l-xl border-r">
+      <div className="w-full lg:w-[65%] min-h-[50vh] p-3 sm:p-4 sm:rounded-l-xl border-b sm:border-r overflow-x-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <Button
@@ -153,7 +155,7 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 justify-center">
             <select
               value={currentMonth.getMonth()}
               onChange={handleMonthChange}
@@ -183,6 +185,7 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
             variant="outline"
             size="icon"
             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+            className="h-8 w-8 sm:h-9 sm:w-9"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -196,9 +199,9 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
       </div>
 
       {/* 📌 TASK PANEL */}
-      <div className="w-[35%] p-6 max-h-[80vh] overflow-hidden overflow-y-auto">
+      <div className="w-full lg:w-[35%] p-4 sm:p-6 sm:max-h-[90vh] overflow-y-auto">
         <div className="w-full">
-          <div className="w-full flex item-center justify-between">
+          <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h2 className="font-semibold mb-2">
               Reports on {format(date, "MMM dd, yyyy")}
             </h2>
@@ -226,67 +229,75 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
           ) : (
             <ul className="space-y-2 mt-4 w-full list-disc">
               <div className="w-full flex justify-between">
-                <p className="text-sm font-medium">Documentation</p>
-                <div className="">
+                <p className="text-sm font-medium">{role === "student" ? "Documentation" : "Actions"}</p>
+                <div className="flex flex-wrap gap-2">
                   <Button onClick={(e) => (navigate(`/home?edit=${search}`))}>Edit</Button>
                   <Button variant="destructive" onClick={(e)=> {setOpenDel(true)}}> Delete </Button>
                   <DeleteModal openDel={openDel} setOpenDel={setOpenDel} rowId={selectedReport[0].reportDateId} fetchTaskEvents={fetchTaskEvents}/>
                 </div>
               </div>
-              
-              {selectedReport && (
-                <div>
-                  <img src={`${import.meta.env.VITE_BASE_URL}/${selectedReport[0].documentation}`} alt={selectedReport[0].documentation} className=""/>
-                </div>
-              )}
+              {role === "student" && (
+                <>
+                  {selectedReport ? (
+                    <div>
+                      <img src={`${import.meta.env.VITE_BASE_URL}/${selectedReport[0].documentation}`} alt={selectedReport[0].documentation} className="w-full h-auto rounded-md"/>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm text-gray-700">No record</p>
+                    </div>
+                  )}
 
-              <p className="text-sm font-medium">Documentation Description</p>
-              {selectedReport && (
-                <li 
-                  className="ml-10 text-justify"
-                >
-                  <p className="text-sm text-gray-700">
-                    {selectedReport[0].doc_desc ?? "No record"}
-                  </p>
-                </li>
-              )}
-              <p className="text-sm font-medium">Objectives</p>
-              {selectedReport.some(item => item.type === "objective") ? (
-                selectedReport
-                  .filter(item => item.type === "objective")
-                  .map(report => (
-                    <li key={report.reportId} className="ml-10 text-justify">
+                  <p className="text-sm font-medium">Documentation Description</p>
+                  {selectedReport && (
+                    <li 
+                      className="ml-10 text-justify"
+                    >
                       <p className="text-sm text-gray-700">
-                        {report.desc}
+                        {selectedReport[0].doc_desc ?? "No record"}
                       </p>
                     </li>
-                  ))
-              ) : (
-                <li className="ml-10 text-justify">
-                  <p className="text-sm text-gray-700">
-                    No Record
-                  </p>
-                </li>
+                  )}
+                  <p className="text-sm font-medium">Objectives</p>
+                  {selectedReport.some(item => item.type === "objective") ? (
+                    selectedReport
+                      .filter(item => item.type === "objective")
+                      .map(report => (
+                        <li key={report.reportId} className="ml-10 text-justify">
+                          <p className="text-sm text-gray-700">
+                            {report.desc}
+                          </p>
+                        </li>
+                      ))
+                  ) : (
+                    <li className="ml-10 text-justify">
+                      <p className="text-sm text-gray-700">
+                        No Record
+                      </p>
+                    </li>
+                  )}
+                  
+                  <p className="text-sm font-medium">Reflection</p>
+                  {selectedReport.some(item => item.type === "reflection") ? (
+                    selectedReport
+                      .filter(item => item.type === "reflection")
+                      .map(report => (
+                        <li key={report.reportId} className="ml-10 text-justify">
+                          <p className="text-sm text-gray-700">
+                            {report.desc}
+                          </p>
+                        </li>
+                      ))
+                  ) : (
+                    <li className="ml-10">
+                      <p className="text-sm text-gray-700">
+                        No Record
+                      </p>
+                    </li>
+                  )}
+                </>
               )}
               
-              <p className="text-sm font-medium">Reflection</p>
-              {selectedReport.some(item => item.type === "reflection") ? (
-                selectedReport
-                  .filter(item => item.type === "reflection")
-                  .map(report => (
-                    <li key={report.reportId} className="ml-10 text-justify">
-                      <p className="text-sm text-gray-700">
-                        {report.desc}
-                      </p>
-                    </li>
-                  ))
-              ) : (
-                <li className="ml-10">
-                  <p className="text-sm text-gray-700">
-                    No Record
-                  </p>
-                </li>
-              )}
               <p className="text-sm font-medium">Task accomplished</p>
               {selectedReport.some(item => item.type === "task_accomplished") ? (
                 selectedReport
@@ -305,63 +316,66 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
                   </p>
                 </li>
               )}
-              <p className="text-sm font-medium">Knowledge</p>
-              {selectedReport.some(item => item.type === "knowledge") ? (
-                selectedReport
-                  .filter(item => item.type === "knowledge")
-                  .map(report => (
-                    <li key={report.reportId} className="ml-10 text-justify">
-                      <p className="text-sm text-gray-700">
-                        {report.desc}
-                      </p>
-                    </li>
-                  ))
-              ) : (
-                <li className="ml-10">
-                  <p className="text-sm text-gray-700">
-                    No Record
-                  </p>
-                </li>
-              )}
+              {role === "student" && (
+                <>
+                    <p className="text-sm font-medium">Knowledge</p>
+                    {selectedReport.some(item => item.type === "knowledge") ? (
+                      selectedReport
+                        .filter(item => item.type === "knowledge")
+                        .map(report => (
+                          <li key={report.reportId} className="ml-10 text-justify">
+                            <p className="text-sm text-gray-700">
+                              {report.desc}
+                            </p>
+                          </li>
+                        ))
+                    ) : (
+                      <li className="ml-10">
+                        <p className="text-sm text-gray-700">
+                          No Record
+                        </p>
+                      </li>
+                    )}
 
-              <p className="text-sm font-medium">Skills</p>
-              {selectedReport.some(item => item.type === "skills") ? (
-                selectedReport
-                  .filter(item => item.type === "skills")
-                  .map(report => (
-                    <li key={report.reportId} className="ml-10 text-justify">
-                      <p className="text-sm text-gray-700">
-                        {report.desc}
-                      </p>
-                    </li>
-                  ))
-              ) : (
-                <li className="ml-10">
-                  <p className="text-sm text-gray-700">
-                    No Record
-                  </p>
-                </li>
-              )}
+                    <p className="text-sm font-medium">Skills</p>
+                    {selectedReport.some(item => item.type === "skills") ? (
+                      selectedReport
+                        .filter(item => item.type === "skills")
+                        .map(report => (
+                          <li key={report.reportId} className="ml-10 text-justify">
+                            <p className="text-sm text-gray-700">
+                              {report.desc}
+                            </p>
+                          </li>
+                        ))
+                    ) : (
+                      <li className="ml-10">
+                        <p className="text-sm text-gray-700">
+                          No Record
+                        </p>
+                      </li>
+                    )}
 
-              <p className="text-sm font-medium">Values</p>
-              {selectedReport.some(item => item.type === "values") ? (
-                selectedReport
-                  .filter(item => item.type === "values")
-                  .map(report => (
-                    <li key={report.reportId} className="ml-10 text-justify">
-                      <p className="text-sm text-gray-700">
-                        {report.desc}
-                      </p>
-                    </li>
-                  ))
-              ) : (
-                <li className="ml-10">
-                  <p className="text-sm text-gray-700">
-                    No Record
-                  </p>
-                </li>
+                    <p className="text-sm font-medium">Values</p>
+                    {selectedReport.some(item => item.type === "values") ? (
+                      selectedReport
+                        .filter(item => item.type === "values")
+                        .map(report => (
+                          <li key={report.reportId} className="ml-10 text-justify">
+                            <p className="text-sm text-gray-700">
+                              {report.desc}
+                            </p>
+                          </li>
+                        ))
+                    ) : (
+                      <li className="ml-10">
+                        <p className="text-sm text-gray-700">
+                          No Record
+                        </p>
+                      </li>
+                    )}
+                </>
               )}
-
               
             </ul>
           )}

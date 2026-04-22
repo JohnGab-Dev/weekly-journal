@@ -20,7 +20,7 @@ import {useState} from 'react'
 import toast from 'react-hot-toast'
 import { addReport } from "@/services/ReportServices"
 
-function AddReport() {
+function AddReport({user}) {
     const {
         register,
         control,
@@ -48,15 +48,19 @@ function AddReport() {
         formData.append("date", data.date)
 
         // file input (IMPORTANT)
-        formData.append("image", data.image[0])
+       if (data.image && data.image[0]) {
+            formData.append("image", data.image[0])
+        }
 
-        formData.append("doc_desc", data.doc_desc)
+        formData.append("doc_desc", data.doc_desc ?? "")
 
         // nested items array
         data.items.forEach((item, index) => {
             formData.append(`items[${index}][type]`, item.type)
             formData.append(`items[${index}][desc]`, item.desc)
         })
+
+        // console.log([...formData])
 
         const response = await addReport(formData)
         
@@ -87,13 +91,13 @@ function AddReport() {
         }
     }
   return (
-    <div className="bg-white rounded-xl">
+    <div className=" bg-white rounded-xl">
         <div className="p-6 border-b">   
-            <h1 className="text-xl font-semibold">Add New Report</h1>
-            <h2 className="text-sm text-gray-700">Add your new accomplished report here.</h2>
+            <h1 className="sm:text-xl font-semibold">Add New Report</h1>
+            <h2 className="text-xs sm:text-sm text-gray-700">Add your new accomplished report here.</h2>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 p-6">
-            <div className='w-2xl flex flex-col gap-4'>
+            <div className='w-full sm:w-2xl flex flex-col gap-4'>
                 <Field>
                     <FieldLabel htmlFor="date">Date</FieldLabel>
                     <Input id="date" type="date" 
@@ -105,26 +109,31 @@ function AddReport() {
                             </p>
                         )}
                 </Field>
-                <Field>
-                    <FieldLabel htmlFor="image">Documentation</FieldLabel>
-                    <Input id="image" type="file" {...register("image")}
-                    />
-                </Field>
-                <Field>
-                    <FieldLabel htmlFor="doc_desc">Documentation Description</FieldLabel>
-                    <Textarea placeholder="Type the description here." id={"doc_desc"}
-                    {...register("doc_desc")}
-                    />
-                </Field>
+                {user.role === "student" && (
+                    <>
+                        <Field>
+                            <FieldLabel htmlFor="image">Documentation</FieldLabel>
+                            <Input id="image" type="file" {...register("image")}
+                            />
+                        </Field>
+                        <Field>
+                            <FieldLabel htmlFor="doc_desc">Documentation Description</FieldLabel>
+                            <Textarea placeholder="Type the description here." id={"doc_desc"}
+                            {...register("doc_desc")}
+                            />
+                        </Field>
+                    </>
+                )}
+                
             </div>
             <div className="">
                 <h1>Report fields</h1>
             </div>
             {fields.map((item, index) => (
-                <div className='w-2xl flex flex-col p-4 bg-gray-50 rounded-lg' key={item.id}>
-                    <div className="w-full flex gap-4">
+                <div className='w-full sm:w-2xl flex flex-col p-4 bg-gray-50 rounded-lg' key={item.id}>
+                    <div className="w-full flex sm:flex-row flex-col-reverse gap-4">
                         
-                        <Field className="w-[75%]">
+                        <Field className="sm:w-[75%]">
                             <FieldLabel htmlFor={`items.${index}.desc`}>Description</FieldLabel>
                             <Textarea placeholder="Type the description here." id={`items.${index}.desc`}
                                 {...register(`items.${index}.desc`, { required: "Description is required" })}
@@ -135,7 +144,7 @@ function AddReport() {
                                     </p>
                                 )}
                         </Field>
-                        <Field className="w-[25%]">
+                        <Field className="sm:w-[25%]">
                             <FieldLabel htmlFor={`items.${index}.type`}>
                             Type
                             </FieldLabel>

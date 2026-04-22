@@ -68,8 +68,8 @@ function EditProfile() {
     }
   return (
     <div className="w-full bg-white shadow-sm p-6 rounded-lg" >
-        <h1 className='text-xl mb-4 font-medium'>Update profile information</h1>
-        <form onSubmit={handleSubmit(onSubmit)} className='max-w-xl'>
+        <h1 className='sm:text-xl mb-4 font-medium'>Update profile information</h1>
+        <form onSubmit={handleSubmit(onSubmit)} className='w-full sm:max-w-xl'>
             <FieldGroup>
                 <Field>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
