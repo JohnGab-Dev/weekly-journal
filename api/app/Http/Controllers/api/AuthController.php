@@ -7,9 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\LogRecorder;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OtpMail;
 
 class AuthController extends Controller
 {
+    
     public function register (Request $request){
         
         $password = $request->password;
@@ -116,12 +119,69 @@ class AuthController extends Controller
         User::where('userId', $userId)->update([
             'otp' => $otp,
         ]);
+
+        $sendOtp = Mail::to($email)->send(new OtpMail($otp));
+
+        if(!$sendOtp){
+            return response()->json([
+            'message' => 'Something went wrong'
+            ], 404);
+        }
+
+        LogRecorder::RecordLog("FORGOT PASSWORD", "OTP sent.", $userId);
+
+        return response()->json([
+                'message' => 'OTP sent successfully',
+                'data' => [
+                    'email' => $email
+                ]
+            ], 200);
         
     } 
     public function verifyOtp(Request $request){
+        $email = $request->email;
+        $otp = $request->otp;
 
+        $user = User::where('email', $email)->first();
+
+        if(!$user){
+            return response()->json([
+                'message' => 'Invalid User'
+            ], 404);
+        }
+
+        if($user->otp !== $otp){
+            return response()->json([
+                'message' => 'Invalid OTP'
+            ], 404);
+        }
+
+        User::where('email', $email)->update([
+            'otp'=> null
+        ]);
+
+        LogRecorder::RecordLog("FORGOT PASSWORD", "OTP verified.", $user->userId);
+
+        return response()->json([
+            'message' => 'OTP verified successfully',
+            'userId' => $user->userId
+        ], 200);
     } 
-    public function changPass(Request $request){
+    
 
+    
+    public function changPass(Request $request){
+        $password = $request->password;
+        $userId = $request->id;
+
+        User::where('userId', $userId)->update([
+            'password' => Hash::make($password)
+        ]);
+
+        LogRecorder::RecordLog("FORGOT PASSWORD", "Password successfully changed.", $userId);
+
+        return response()->json([
+            'message' => 'Password saved, please re-login your account'
+        ], 200);
     }
 }

@@ -29,8 +29,7 @@ export function AddModal({ openAdd, setOpenAdd, fetchData }) {
   const onSubmit = async (data) => {
     try {
       setLoading(true)
-      const response = await AddEvent(data)
-      console.log(response.data.message)      
+      const response = await AddEvent(data)     
       if(response.status === 200){
         toast.success(`${response.data.message}`,{
           duration: 4000,

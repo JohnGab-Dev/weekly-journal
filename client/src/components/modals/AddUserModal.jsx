@@ -40,8 +40,7 @@ export function AddUserModal({ openAdd, setOpenAdd, fetchUsers }) {
   const onSubmit = async (data) => {
     try {
       setLoading(true)
-      const response = await AddUser(data)
-      console.log(response.data.message)      
+      const response = await AddUser(data)     
       if(response.status === 200){
         toast.success(`${response.data.message}`,{
           duration: 4000,

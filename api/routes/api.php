@@ -48,6 +48,7 @@ Route::middleware('auth:sanctumn', 'role:student,employee')->group(function(){
 });
 
 Route::middleware('auth:sanctum', 'role:admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'getDashboardData']);
     Route::get('/users', [AdminController::class, 'getallUsers']);
     Route::get('/bin', [AdminController::class, 'getallArchives']);
     Route::post('/users-add', [AdminController::class, 'addUser']);

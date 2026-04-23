@@ -60,8 +60,6 @@ function AddReport({user}) {
             formData.append(`items[${index}][desc]`, item.desc)
         })
 
-        // console.log([...formData])
-
         const response = await addReport(formData)
         
         if(response.status === 200){

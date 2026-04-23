@@ -21,8 +21,7 @@ function ChangePass() {
     const onSubmit = async (data) => {
         try {
         setLoading(true)
-        const response = await ChangePassword(data)
-        console.log(response.data.message)      
+        const response = await ChangePassword(data)     
         if(response.status === 200){
             toast.success(`${response.data.message}`,{
             duration: 4000,

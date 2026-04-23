@@ -45,7 +45,7 @@ export function EditModal({ openEdit, setOpenEdit, fetchData, row }) {
     try {
       setLoading(true)
       const response = await EditEvent(data, id)
-      console.log(response.data.message)      
+          
       if(response.status === 200){
         toast.success(`${response.data.message}`,{
           duration: 4000,

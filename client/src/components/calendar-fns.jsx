@@ -47,7 +47,7 @@ export default function Calendar({ fetchTaskEvents, events, reportDates, selecte
     setDate(day);
     const formatted = format(day, "yyyy-MM-dd");
     setSearch(formatted)
-    console.log(events)
+   
   };
 
   const handleMonthChange = (e) => {

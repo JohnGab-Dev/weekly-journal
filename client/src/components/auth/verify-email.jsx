@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card"
 import {
   Field,
-  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
@@ -17,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import {useState} from 'react'
-import { login } from '@/services/AuthService'
+import { emailVerify } from '@/services/AuthService'
 import toast from 'react-hot-toast'
 
 
@@ -33,7 +32,7 @@ export function VerifyEmail({
       
       try {
         setLoading(true)
-        const response = await login(data);
+        const response = await emailVerify(data);
         
         if(response.status === 200){
           toast.success(`${response.data.message}`,{
@@ -42,10 +41,7 @@ export function VerifyEmail({
           });
           reset()
           
-          // if(response.data.data){
-          //   localStorage.setItem("user", JSON.stringify(response.data.data));
-          //   response.data.url && navigate(response.data.url);
-          // }
+          navigate(`/verify-otp?email=${data.email}`)
         }
 
       } catch (error) {

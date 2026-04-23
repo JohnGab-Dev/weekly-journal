@@ -39,8 +39,7 @@ export function ChangePass({ openCpass, setOpenCpass, row}) {
     let id = row.userId
     try {
       setLoading(true)
-      const response = await changePass(data, id)
-      console.log(response.data.message)      
+      const response = await changePass(data, id)    
       if(response.status === 200){
         toast.success(`${response.data.message}`,{
           duration: 4000,

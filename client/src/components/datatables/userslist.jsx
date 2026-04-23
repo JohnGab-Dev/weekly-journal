@@ -68,7 +68,6 @@ function UserList() {
       const response = await api.get(url);
       setUsers(response.data.data)
       setLastPage(response.data.meta.last_page)
-      // setTotal(response.data.meta.total)
       setPage(response.data.meta.current_page)
 
     } catch (error) {
@@ -84,8 +83,8 @@ function UserList() {
       <EditUserModal openEdit={openEdit} setOpenEdit={setOpenEdit} row={selectedRow} fetchUsers={fetchUsers} />
       <DeleteModal  openDel={openDel} setOpenDel={setOpenDel} row={selectedRow} fetchUsers={fetchUsers} />
       <div className='p-6 rounded-lg border bg-white'>
-          <div className='flex items-end justify-between gap-4 mb-4 w-full'>
-              <div className='min-w-sm flex flex-col gap-2'>
+          <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4 w-full'>
+              <div className='sm:min-w-sm flex flex-col gap-2'>
                 <Label htmlFor="username-1">Search</Label>
                 <Input id="username-1" type='text' placeholder="search by name or email..." className="w-full" onChange={(e)=>(setSearch(e.target.value))}/>
               </div>

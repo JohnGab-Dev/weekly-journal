@@ -28,7 +28,6 @@ function EditReport({ date, user }) {
         try {
             const res = await api.get(`/fetch-report?date=${date}`)
             const report = res.data.report
-            console.log(res.data.report)
             if (!report) return
             setReport(report)
 

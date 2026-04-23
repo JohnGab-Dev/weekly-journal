@@ -77,8 +77,8 @@ function ArchiveList() {
       <RetrieveModal openRet={openRet} setOpenRet={setOpenRet} row={selectedRow} fetchUsers={fetchUsers} />
       <EditUserModal openEdit={openEdit} setOpenEdit={setOpenEdit} row={selectedRow} fetchUsers={fetchUsers} />
       <div className='p-6 rounded-lg border bg-white'>
-          <div className='flex items-end justify-between gap-4 mb-4 w-full'>
-              <div className='min-w-sm flex flex-col gap-2'>
+          <div className='flex sm:items-end justify-between gap-4 mb-4 w-full'>
+              <div className='min-w-xs sm:min-w-sm flex flex-col gap-2'>
                 <Label htmlFor="username-1">Search</Label>
                 <Input id="username-1" type='text' placeholder="search by name or email..." className="w-full" onChange={(e)=>(setSearch(e.target.value))}/>
               </div>

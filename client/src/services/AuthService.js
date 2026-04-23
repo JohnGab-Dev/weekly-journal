@@ -20,20 +20,20 @@ export const logout = () => {
 
 
 export const emailVerify = (data) => {
-    const res = api.post('/email-verify', data);
+    const res = api.post('/verify-email', data, { 'Content-Type': 'application/json' });
     
     return res
 }
 
 
-export const verifyOtp = (data) => {
-    const res = api.post('/otp-verify', data);
+export const verifyOtp = (email, data) => {
+    const res = api.post(`/verify-otp?email=${email}`, data, { 'Content-Type': 'application/json' });
     
     return res
 }
 
-export const changePass = (data) => {
-    const res = api.post('/change-pass', data);
+export const changePass = (userId, data) => {
+    const res = api.post(`/change-pass?id=${userId}`, data);
     
     return res
 }

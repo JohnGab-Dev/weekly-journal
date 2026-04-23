@@ -37,7 +37,7 @@ function Page() {
         setReportDates(response.data.reportDates)
         setSelectedEvent(response.data.filteredEvent)
         setSelectedReport(response.data.filteredReport)
-        // console.log(response.data)
+        
       }catch(error){
         console.error(error);
       }

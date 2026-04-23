@@ -10,6 +10,7 @@ class Log extends Model
     protected $fillable = [
         'userId',
         'title',
-        'log'
+        'log',
+        'created_at'
     ];
 }

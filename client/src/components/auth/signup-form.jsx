@@ -25,6 +25,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm, Controller } from 'react-hook-form';
 import {useState} from 'react'
 import toast from 'react-hot-toast'
+import { signup } from "@/services/AuthService"
 export function SignupForm({
   ...props
 }) {

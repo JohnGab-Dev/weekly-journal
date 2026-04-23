@@ -20,7 +20,8 @@ class ReportController extends Controller
 
         if($request->date){
             $filteredEvent = Events::where('date', $request->date)->get();
-            $filteredReport = ReportDate::select('report_date.*', 'reports.*', 'report_date.description as doc_desc', 'reports.description as desc')->join('reports', 'report_date.reportDateId', '=', 'reports.reportDateId')
+            $filteredReport = ReportDate::select('report_date.*', 'reports.*', 'report_date.description as doc_desc', 'reports.description as desc')
+                ->join('reports', 'report_date.reportDateId', '=', 'reports.reportDateId')
                 ->where('report_date.date', $request->date)
                 ->where('report_date.userId', $userId)
                 ->get();
@@ -62,7 +63,12 @@ class ReportController extends Controller
             $reportDateId = $existingDate->reportDateId;
         }else{
             if($request->hasFile('image')){
-                $imgpath = $request->file('image')->store('uploads', 'public');
+
+                $file = $request->file('image');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('storage/uploads'), $filename);
+                $imgpath = 'uploads/' . $filename;
+
             }
             $newReportDate = ReportDate::create([
                 'date' => $date,
@@ -105,9 +111,17 @@ class ReportController extends Controller
 
         if($request->hasFile('image')){
             if($oldImg !== ""){
-                Storage::disk('public')->delete($oldImg);
+                $path = public_path('storage/'.$oldImg);
+
+                if (file_exists($path)) {
+                    unlink($path);
+                }
             }
-            $imgpath = $request->file('image')->store('uploads', 'public');
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/uploads'), $filename);
+            $imgpath = 'uploads/' . $filename;
+
             ReportDate::where('reportDateId', $reportDateId)->update([
                 'date' => $date,
                 'description' => $doc_desc,
@@ -159,8 +173,12 @@ class ReportController extends Controller
         $report = ReportDate::where('reportDateId', $reportDateId)->first();
 
         // delete image if exists
-        if ($report->documentation && Storage::disk('public')->exists($report->documentation)) {
-            Storage::disk('public')->delete($report->documentation);
+        if ($report->documentation) {
+            $path = public_path('storage/'.$report->documentation);
+
+            if (file_exists($path)) {
+                unlink($path);
+            }
         }
 
         $report->delete();

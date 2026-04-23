@@ -31,7 +31,6 @@ function ExportReport({ user }) {
         
         try{
             const res = await api.get(url)
-            console.log(res.data.data)
             setData(res.data.data)
         }catch(error){  
             console.error(error)

@@ -43,7 +43,7 @@ export function EditUserModal({ openEdit, setOpenEdit, fetchUsers, row }) {
     try {
       setLoading(true)
       const response = await EditUser(data, id)
-      console.log(response.data.message)      
+           
       if(response.status === 200){
         toast.success(`${response.data.message}`,{
           duration: 4000,

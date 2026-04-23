@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import {useState} from 'react'
-import { login } from '@/services/AuthService'
+import { changePass } from '@/services/AuthService'
 import toast from 'react-hot-toast'
 
 
@@ -26,14 +26,20 @@ export function ChangePass({
   ...props
 }) {
 
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const { register, handleSubmit,watch, reset, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false)
+    const password = watch("password")
     const navigate = useNavigate(); 
+
+    const userId = localStorage.getItem("userId")
+    if(!userId){
+      navigate('/login')
+    }
     const onSubmit = async (data) => {
-      
       try {
         setLoading(true)
-        const response = await login(data);
+        
+        const response = await changePass(userId,data);
         
         if(response.status === 200){
           toast.success(`${response.data.message}`,{
@@ -41,13 +47,8 @@ export function ChangePass({
             position: 'top-right',
           });
           reset()
-          
-          if(response.data.data){
-            localStorage.setItem("user", JSON.stringify(response.data.data));
-            localStorage.setItem("isAuthenticated", true);
-            localStorage.setItem("token", response.data.token)
-          }
-          response.data.url && navigate(response.data.url);
+          localStorage.removeItem('userId')
+          navigate('/login')
         }
 
       } catch (error) {
@@ -57,8 +58,6 @@ export function ChangePass({
             position: 'top-right',
           });
           console.error("Server Error:", error.response.data.message)
-        } else if (error.request) {
-          console.error("No response from server")
         } else {
           console.error("Request error:", error.message)
         }
@@ -70,51 +69,53 @@ export function ChangePass({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className=" px-4 justify-center">
         <CardHeader className="mb-6">
-          <CardTitle className='text-xl'>Login to your account</CardTitle>
+          <CardTitle className='text-xl'>Set up new password</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your new password
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" type="text" 
-                  {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
-                    message: "Email is not valid"
-                  }
-                })}
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input id="password" type="password" 
+                {...register("password", {
+                        required: "Password is required",
+                        minLength: {
+                          value: 8,
+                          message: "Must be at least 8 characters",
+                        },
+                    })}
+              />
+              {errors.password && (
+                    <p className="text-sm text-red-500">
+                      {errors.password.message}
+                    </p>
+                  )}
+              <FieldDescription>
+                Must be at least 8 characters long.
+              </FieldDescription>
+            </Field>
+              <Field>
+                <FieldLabel htmlFor="confirm-password">
+                  Confirm Password
+                </FieldLabel>
+                <Input id="confirm-password" type="password" 
+                  {...register("confirmPassword", {
+                      required: "Confirm your password",
+                      validate: (value) =>
+                        value === password || "Passwords do not match",
+                    })}
                 />
-                {errors.email && <p className="text-red-600 text-xs">{errors.email.message}</p>}
+                {errors.confirmPassword && (
+                    <p className="text-sm text-red-500">
+                      {errors.confirmPassword.message}
+                    </p>
+                  )}
               </Field>
               <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input id="password" type="password" 
-                  {...register("password", {
-                  required: "Password is required",
-                  })}
-                />
-                {errors.password && (<p className="text-red-600 text-xs">{errors.password.message}</p>)}
-              </Field>
-              <Field>
-                <Button type="submit" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</Button>
-                <Button variant="outline" type="button">
-                  Login with Google
-                </Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <Link to="/signup">Sign up</Link>
-                </FieldDescription>
+                <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
               </Field>
             </FieldGroup>
           </form>

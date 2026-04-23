@@ -84,7 +84,7 @@ class StudentController extends Controller
             ]);
         }
 
-        $templatePath = storage_path('app/public/templates/template-for-ojt.docx');
+        $templatePath = public_path('storage/templates/template-for-ojt.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
 
         $templateProcessor->setValue('owner', $name);
@@ -202,7 +202,7 @@ class StudentController extends Controller
             $templateProcessor->setImageValue(
                 'image#' . $imgIndex,
                 [
-                    'path' => storage_path('app/public/' . ltrim($img->documentation, '/')),
+                    'path' => public_path('storage/' . ltrim($img->documentation, '/')),
                     'width' => 600,
                     'height' => 300,
                     'ratio' => true,

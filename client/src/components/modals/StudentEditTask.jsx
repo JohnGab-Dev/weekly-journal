@@ -66,7 +66,7 @@ export function EditModal({ openEdit, setOpenEdit, fetchTasks, row }) {
         formData.append("image", data.image[0]);
       }
       const response = await EditTask(id, formData)
-      console.log(response.data.message)      
+          
       if(response.status === 200){
         toast.success(`${response.data.message}`,{
           duration: 4000,

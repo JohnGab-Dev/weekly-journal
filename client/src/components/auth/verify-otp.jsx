@@ -18,11 +18,10 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { Input } from "@/components/ui/input"
-import { Link, useNavigate } from "react-router-dom";
+import { useSearchParams,useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import {useState} from 'react'
-import { login } from '@/services/AuthService'
+import { verifyOtp } from '@/services/AuthService'
 import toast from 'react-hot-toast'
 
 
@@ -30,30 +29,32 @@ export function VerifyOtp({
   className,
   ...props
 }) {
-
+    const [searchParams] = useSearchParams();
+    const email = searchParams.get("email");
     const { control, handleSubmit, reset, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate(); 
+
+    if(!email){
+      navigate('/login')
+    }
+
+
     const onSubmit = async (data) => {
       
       try {
         setLoading(true)
-        console.log(data)
-        // const response = await login(data);
+        const response = await verifyOtp(email, data);
         
-        // if(response.status === 200){
-        //   toast.success(`${response.data.message}`,{
-        //     duration: 4000,
-        //     position: 'top-right',
-        //   });
-        //   reset()
-          
-        //   if(response.data.data){
-        //     localStorage.setItem("token", response.data.token)
-        //     response.data.url && navigate(response.data.url);
-        //   }
-          
-        
+        if(response.status === 200){
+          toast.success(`${response.data.message}`,{
+            duration: 4000,
+            position: 'top-right',
+          });
+          reset()
+          localStorage.setItem("userId", response.data.userId)
+          navigate('/change-password')
+        }
 
       } catch (error) {
         if (error.response) {

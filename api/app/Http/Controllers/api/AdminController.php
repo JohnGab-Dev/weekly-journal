@@ -11,9 +11,43 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Helpers\LogRecorder;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    public function getDashboardData(){
+        $totalLogsPerDate  = Log::select(DB::raw('DATE(created_at)'))
+                    ->groupBy(DB::raw('DATE(created_at)'))
+                    ->get()
+                    ->count();
+        $totalLogs = Log::all()->count();
+        $totalUsers = User::count();
+        $averageLogs = number_format(($totalLogs /$totalLogsPerDate));
+        $activeAccounts = User::where('status', 'active')->count();
+        $archiveAccounts = User::where('status', 'disabled')->count();
+
+       $mostActiveUsers = User::select(
+                        'users.userId',
+                        'users.name',
+                        'users.email',
+                        'users.role',
+                        DB::raw('COUNT(logs.userId) as total_logs')
+                    )
+                    ->join('logs', 'users.userId', '=', 'logs.userId')
+                    ->groupBy('users.userId', 'users.name', 'users.email', 'users.role')
+                    ->orderByDesc('total_logs')
+                    ->limit(10)
+                    ->get();
+
+        return response()->json([
+            'totalUsers' => $totalUsers,
+            'averageLogs' => $averageLogs,
+            'activeAccounts' => $activeAccounts,
+            'archiveAccounts' => $archiveAccounts,
+            'data' => $mostActiveUsers
+        ]);
+
+    }
     //users management
         public function getallUsers(Request $request){
             $query = User::query();

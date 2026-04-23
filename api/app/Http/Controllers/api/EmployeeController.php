@@ -75,7 +75,7 @@ class EmployeeController extends Controller
             ]);
         }
 
-        $templatePath = storage_path('app/public/templates/monthly_report_template.docx');
+        $templatePath = public_path('storage/templates/monthly_report_template.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
 
         $templateProcessor->setValue('doc_owner_name', $name);

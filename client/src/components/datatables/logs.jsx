@@ -70,13 +70,13 @@ function UserList() {
     <div>
     
       <div className='p-6 rounded-lg border bg-white'>
-          <div className='flex items-end justify-between gap-4 mb-4 w-full'>
-              <div className='min-w-sm flex flex-col gap-2'>
+          <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4 w-full'>
+              <div className='min-w-xs sm:min-w-sm flex flex-col gap-2'>
                 <Label htmlFor="search">Search</Label>
                 <Input id="search" type='text' placeholder="search by title..." className="w-full" onChange={(e)=>(setSearch(e.target.value))}/>
               </div>
 
-              <div className='min-w-sm flex flex-col gap-2'>
+              <div className='min-w-xs sm:min-w-sm flex flex-col gap-2'>
                 <Label htmlFor="date">Filter by date</Label>
                 <Input id="date" type='date' className="w-full" onChange={(e)=>(setDate(e.target.value))}/>
               </div>

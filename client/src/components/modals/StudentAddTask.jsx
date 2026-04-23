@@ -48,7 +48,7 @@ export function AddModal({ openAdd, setOpenAdd, fetchTaskEvents }) {
         formData.append("image", data.image[0]);
       }
       const response = await AddTask(formData)
-      console.log(response.data.message)      
+            
       if(response.status === 200){
         toast.success(`${response.data.message}`,{
           duration: 4000,
