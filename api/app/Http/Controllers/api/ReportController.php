@@ -48,7 +48,7 @@ class ReportController extends Controller
     public function addReport(Request $request){
         if($request->hasFile('image')){
             $request->validate([
-                'image' => 'image|mimes:jpg,png,jpeg|max:2048'
+                'image' => 'image|mimes:jpg,png,jpeg|max:10240'
             ]);
         }
         $date = $request->date;
@@ -97,7 +97,7 @@ class ReportController extends Controller
     public function editReport(Request $request){
         if($request->hasFile('image')){
             $request->validate([
-                'image' => 'image|mimes:jpg,png,jpeg|max:2048'
+                'image' => 'image|mimes:jpg,png,jpeg|max:10240'
             ]);
         }
         
