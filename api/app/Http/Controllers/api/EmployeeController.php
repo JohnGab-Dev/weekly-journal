@@ -119,7 +119,7 @@ class EmployeeController extends Controller
         $templateProcessor->setValue('designation', $head_designation);
 
 
-        $fileName = preg_replace('/[^A-Za-z0-9]/', '_', trim($name)) . '_' . date('Ymd_His') . '.docx';
+        $fileName = preg_replace('/[^A-Za-z0-9]/', '_', trim($name)) . '_Month_of_' . date('F', strtotime($startDate)) . '.docx';
         $tempFile = tempnam(sys_get_temp_dir(), 'docx');
 
         $templateProcessor->saveAs($tempFile);
